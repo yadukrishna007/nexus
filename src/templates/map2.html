@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="../static/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@6.15.0/ol.css" />
+  <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Ken Adams</h2>
+      </div>
+      <nav class="sidebar-menu">
+        <a href="dash.html" class="menu-item active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="map.html" class="menu-item"><i class="fas fa-volume-up"></i> Noise Pollution</a>
+        <a href="map.html" class="menu-item"><i class="fas fa-wind"></i> Air Pollution</a>
+        <a href="map.html" class="menu-item"><i class="fas fa-tint"></i> Humidity Pollution</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="header">
+        <div class="location headerbox">Current Location: Kolikode</div>
+        <div class="status headerbox">Air Quality: <span class="good">Good</span></div>
+        <div class="status headerbox">Noise Quality: <span class="bad">Bad</span></div>
+        <div class="status headerbox">Humidity Quality: <span class="moderate">Moderate</span></div>
+      </header>
+      <section class="content">
+        <!-- OpenLayers Map -->
+        <div id="map" style="width: 100%; height: 900px;"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Initialize OpenLayers map
+    const map = new ol.Map({
+      target: 'map',
+      layers: [
+        new ol.layer.Tile({
+          source: new ol.source.OSM(),
+        }),
+      ],
+      view: new ol.View({
+        center: ol.proj.fromLonLat([77.2090, 28.6139]),  // Coordinates for New Delhi (or Kolikode)
+        zoom: 10,
+      }),
+    });
+
+    // Dummy data for heatmap (latitude, longitude, and intensity)
+    const heatmapData = [
+      {"latitude": 28.6139, "longitude": 77.2090, "intensity": 1.0},  // Delhi
+      {"latitude": 19.0760, "longitude": 72.8777, "intensity": 0.8},  // Mumbai
+      {"latitude": 12.9716, "longitude": 77.5946, "intensity": 0.6},  // Bangalore
+      {"latitude": 13.0827, "longitude": 80.2707, "intensity": 0.4},  // Chennai
+      {"latitude": 22.5726, "longitude": 88.3639, "intensity": 0.2},  // Kolkata
+    ];
+
+    // Convert the heatmap data into OpenLayers features
+    const features = heatmapData.map(item => {
+      const coordinate = ol.proj.fromLonLat([item.longitude, item.latitude]);
+      const feature = new ol.Feature({
+        geometry: new ol.geom.Point(coordinate),
+        weight: item.intensity,  // Intensity value for the heatmap
+      });
+      return feature;
+    });
+
+    // Create a heatmap layer
+    const heatmapLayer = new ol.layer.Heatmap({
+      source: new ol.source.Vector({
+        features: features,
+      }),
+      blur: 15,   // Adjust the blur effect
+      radius: 10, // Adjust the size of each point in the heatmap
+    });
+
+    // Add the heatmap layer to the map
+    map.addLayer(heatmapLayer);
+
+    // Log to check if the heatmap is successfully added
+    console.log('Heatmap layer added');
+  </script>
+</body>
+</html>
