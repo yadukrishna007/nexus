@@ -46,51 +46,98 @@
         </header>
         <section class="content">
           <!-- OpenLayers Map -->
-          <div id="map" style="width:100%; height:900px; z-index: 0;"></div>
+          <div id="map" style="width:100%; height:900px; z-index: 0; margin-top: 0px;"></div>
         </section>
       </div>
     </main>
   </div>
 
   <script>
-    //from backend
-     // Heatmap data passed from Flask
-  const dataPoints = JSON.parse('{{ heatmap_data|tojson|escapejs }}');
-  //baselayer
-  const baseLayer = new ol.layer.Tile({
+  //   //from backend
+  //    // Heatmap data passed from Flask
+  // const dataPoints = JSON.parse('{{ heatmap_data|tojson|escapejs }}');
+  // //baselayer
+  // const baseLayer = new ol.layer.Tile({
+  //     source: new ol.source.OSM(),
+  //   });
+  
+  // // Convert data points to OpenLayers features
+  // const features = dataPoints.map((point) => {
+  //   const feature = new ol.Feature({
+  //     geometry: new ol.geom.Point(ol.proj.fromLonLat([point.lon, point.lat])),
+  //   });
+  //   feature.set('weight', point.weight);
+  //   return feature;
+  // });
+
+  // // Heatmap source and layer
+  // const heatmapSource = new ol.source.Vector({
+  //   features: features,
+  // });
+
+  // const heatmapLayer = new ol.layer.Heatmap({
+  //   source: heatmapSource,
+  //   blur: 20,
+  //   radius: 20,
+  //   weight: (feature) => feature.get('weight'),
+  // });
+
+  // // Create map with base layer and heatmap
+  // const map = new ol.Map({
+  //   target: 'map',
+  //   layers: [baseLayer, heatmapLayer],
+  //   view: new ol.View({
+  //     center: ol.proj.fromLonLat([75.231870, 12.240140]), //lon lat
+  //     zoom: 16,
+  //   }),
+  // });
+
+   // Initialize OpenLayers map
+   const baseLayer = new ol.layer.Tile({
       source: new ol.source.OSM(),
     });
-  
-  // Convert data points to OpenLayers features
-  const features = dataPoints.map((point) => {
-    const feature = new ol.Feature({
-      geometry: new ol.geom.Point(ol.proj.fromLonLat([point.lon, point.lat])),
+
+    // Dummy data points for heat map (latitude, longitude, and weight)
+    const dataPoints = [
+      { lon: 75.231870, lat: 12.240140, weight: 0.8 },  // College of Engineering Trikaripur
+      { lon: 75.233870, lat: 12.242140, weight: 0.6 },  // Nearby point 1
+      { lon: 75.229870, lat: 12.238140, weight: 0.9 },  // Nearby point 2
+      { lon: 75.235870, lat: 12.241140, weight: 0.7 },  // Nearby point 3
+    ];
+
+    // Convert data points to OpenLayers features
+    const features = dataPoints.map((point) => {
+      const feature = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([point.lon, point.lat])),
+      });
+      feature.set('weight', point.weight);
+      return feature;
     });
-    feature.set('weight', point.weight);
-    return feature;
-  });
 
-  // Heatmap source and layer
-  const heatmapSource = new ol.source.Vector({
-    features: features,
-  });
+    // Heatmap source and layer
+    const heatmapSource = new ol.source.Vector({
+      features: features,
+    });
 
-  const heatmapLayer = new ol.layer.Heatmap({
-    source: heatmapSource,
-    blur: 20,
-    radius: 20,
-    weight: (feature) => feature.get('weight'),
-  });
+    const heatmapLayer = new ol.layer.Heatmap({
+      source: heatmapSource,
+      blur: 20,   // Blurring effect radius
+      radius: 10, // Radius of the heatmap points
+      weight: (feature) => feature.get('weight'), // Use the weight property for intensity
+    });
 
-  // Create map with base layer and heatmap
-  const map = new ol.Map({
-    target: 'map',
-    layers: [baseLayer, heatmapLayer],
-    view: new ol.View({
-      center: ol.proj.fromLonLat([75.231870, 12.240140]), //lon lat
-      zoom: 16,
-    }),
-  });
+    // Create map with base layer and heatmap
+    const map = new ol.Map({
+      target: 'map',
+      layers: [baseLayer, heatmapLayer],
+      view: new ol.View({
+        center: ol.proj.fromLonLat([75.231870, 12.240140]),
+        zoom: 16, // Set the zoom level
+      }),
+    });
+
+    // Log to check if the heatmap is successfully initialized
+    console.log('Heatmap initialized with dummy data');
   </script>
 </body>
 </html>
