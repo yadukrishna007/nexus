@@ -1,27 +1,18 @@
 from flask import Flask, render_template, jsonify
-from flask_cors import CORS  # To allow cross-origin requests
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
 
-# Dummy data for heatmap (latitude, longitude, and intensity)
-dummy_data = [
-    {"latitude": 28.6139, "longitude": 77.2090, "intensity": 1.0},  # Delhi
-    {"latitude": 19.0760, "longitude": 72.8777, "intensity": 0.8},  # Mumbai
-    {"latitude": 12.9716, "longitude": 77.5946, "intensity": 0.6},  # Bangalore
-    {"latitude": 13.0827, "longitude": 80.2707, "intensity": 0.4},  # Chennai
-    {"latitude": 22.5726, "longitude": 88.3639, "intensity": 0.2},  # Kolkata
-]
-
+# Route to render the map page
 @app.route('/')
-def index():
-    # Render the map page (ensure map.html is inside the templates folder)
-    return render_template('map.html')
-
-@app.route('/get-heatmap-data', methods=['GET'])
-def get_heatmap_data():
-    # Return the dummy data as JSON
-    return jsonify(dummy_data), 200
+def map_page():
+    # Dummy data points for heatmap (latitude, longitude, and weight)
+    heatmap_data = [
+        {"lon": 75.231870, "lat": 12.240140, "weight": 0.8},  # College of Engineering Trikaripur
+        {"lon": 75.233870, "lat": 12.242140, "weight": 0.6},  # Nearby point 1
+        {"lon": 75.229870, "lat": 12.238140, "weight": 0.9},  # Nearby point 2
+        {"lon": 75.235870, "lat": 12.241140, "weight": 0.7},  # Nearby point 3
+    ]
+    return render_template('map.html', heatmap_data=heatmap_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
